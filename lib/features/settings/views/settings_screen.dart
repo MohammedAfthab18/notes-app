@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/responsive.dart';
 import '../../../services/backup_service.dart';
 import '../../home/providers/home_providers.dart';
 
@@ -25,7 +26,9 @@ class SettingsScreen extends ConsumerWidget {
         middle: Text('Settings'),
       ),
       child: SafeArea(
-        child: ListView(
+        child: ResponsiveContent(
+          maxWidth: 760,
+          child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
           children: [
             _Group(
@@ -53,21 +56,21 @@ class SettingsScreen extends ConsumerWidget {
                   title: 'Export JSON',
                   icon: CupertinoIcons.square_arrow_up,
                   onTap: () async {
-                    final file = await BackupService().exportJson(
+                    final target = await BackupService().exportJson(
                       ref.read(subjectsProvider),
                       ref.read(chaptersProvider),
                     );
-                    if (context.mounted) _toast(context, 'Saved ${file.path}');
+                    if (context.mounted) _toast(context, 'Saved $target');
                   },
                 ),
                 _Row(
                   title: 'Export TXT',
                   icon: CupertinoIcons.doc_plaintext,
                   onTap: () async {
-                    final file = await BackupService().exportTxt(
+                    final target = await BackupService().exportTxt(
                       ref.read(chaptersProvider),
                     );
-                    if (context.mounted) _toast(context, 'Saved ${file.path}');
+                    if (context.mounted) _toast(context, 'Saved $target');
                   },
                 ),
                 _Row(
@@ -96,6 +99,7 @@ class SettingsScreen extends ConsumerWidget {
               ],
             ),
           ],
+          ),
         ),
       ),
     );

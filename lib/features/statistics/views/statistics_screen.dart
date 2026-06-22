@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/responsive.dart';
 import '../../../core/utils/text_metrics.dart';
 import '../../home/providers/home_providers.dart';
 
@@ -26,60 +27,63 @@ class StatisticsScreen extends ConsumerWidget {
         middle: Text('Statistics'),
       ),
       child: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            _MetricGrid(
-              values: [
-                (
-                  'Subjects',
-                  subjects.length.toString(),
-                  CupertinoIcons.folder_fill,
-                  theme.tint,
-                ),
-                (
-                  'Chapters',
-                  chapters.length.toString(),
-                  CupertinoIcons.doc_text_fill,
-                  theme.purple,
-                ),
-                (
-                  'Words',
-                  words.toString(),
-                  CupertinoIcons.textformat,
-                  theme.mint,
-                ),
-                (
-                  'Reading hours',
-                  hours,
-                  CupertinoIcons.clock_fill,
-                  theme.amber,
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Knowledge Balance',
-              style: TextStyle(
-                color: theme.text,
-                fontSize: 22,
-                fontWeight: FontWeight.w900,
+        child: ResponsiveContent(
+          maxWidth: 1120,
+          child: ListView(
+            padding: const EdgeInsets.all(20),
+            children: [
+              _MetricGrid(
+                values: [
+                  (
+                    'Subjects',
+                    subjects.length.toString(),
+                    CupertinoIcons.folder_fill,
+                    theme.tint,
+                  ),
+                  (
+                    'Chapters',
+                    chapters.length.toString(),
+                    CupertinoIcons.doc_text_fill,
+                    theme.purple,
+                  ),
+                  (
+                    'Words',
+                    words.toString(),
+                    CupertinoIcons.textformat,
+                    theme.mint,
+                  ),
+                  (
+                    'Reading hours',
+                    hours,
+                    CupertinoIcons.clock_fill,
+                    theme.amber,
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 14),
-            for (final subject in subjects)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 14),
-                child: _SubjectBar(
-                  name: subject.title,
-                  count: chapters
-                      .where((chapter) => chapter.subjectId == subject.id)
-                      .length,
-                  max: chapters.length.clamp(1, 9999),
-                  color: theme.tint,
+              const SizedBox(height: 24),
+              Text(
+                'Knowledge Balance',
+                style: TextStyle(
+                  color: theme.text,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w900,
                 ),
               ),
-          ],
+              const SizedBox(height: 14),
+              for (final subject in subjects)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: _SubjectBar(
+                    name: subject.title,
+                    count: chapters
+                        .where((chapter) => chapter.subjectId == subject.id)
+                        .length,
+                    max: chapters.length.clamp(1, 9999),
+                    color: theme.tint,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -93,14 +97,15 @@ class _MetricGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final columns = MediaQuery.sizeOf(context).width >= 900 ? 4 : 2;
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: columns,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
-        childAspectRatio: 1.25,
+        childAspectRatio: columns == 4 ? 1.15 : 1.25,
       ),
       itemCount: values.length,
       itemBuilder: (_, index) {

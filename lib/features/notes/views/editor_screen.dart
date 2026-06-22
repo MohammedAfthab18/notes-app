@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/responsive.dart';
 import '../../home/providers/home_providers.dart';
 import '../models/chapter.dart';
 import '../providers/note_providers.dart';
@@ -74,7 +75,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         ),
       ),
       child: SafeArea(
-        child: Column(
+        child: ResponsiveContent(
+          maxWidth: 1200,
+          child: Column(
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
@@ -168,6 +171,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               ),
             ),
           ],
+          ),
         ),
       ),
     );

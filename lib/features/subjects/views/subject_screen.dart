@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/responsive.dart';
 import '../../../services/file_import_service.dart';
 import '../../home/providers/home_providers.dart';
 import '../../home/widgets/adaptive_search_field.dart';
@@ -50,7 +51,9 @@ class _SubjectScreenState extends ConsumerState<SubjectScreen> {
         ),
       ),
       child: SafeArea(
-        child: CustomScrollView(
+        child: ResponsiveContent(
+          maxWidth: 1100,
+          child: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
               child: Padding(
@@ -116,6 +119,7 @@ class _SubjectScreenState extends ConsumerState<SubjectScreen> {
                 },
               ),
           ],
+          ),
         ),
       ),
     );

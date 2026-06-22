@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/responsive.dart';
 import '../../notes/providers/note_providers.dart';
 import '../models/subject.dart';
 import '../providers/home_providers.dart';
@@ -36,6 +37,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final favorites = ref.watch(favoritesProvider);
     final recents = ref.watch(recentChaptersProvider);
     final recentCount = recents.length > 4 ? 4 : recents.length;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isDesktop = responsiveClassForWidth(screenWidth) == ResponsiveClass.desktop;
+    final gridColumns = isDesktop ? 3 : 2;
+    final gridAspect = isDesktop ? 1.02 : 1.08;
 
     return CupertinoPageScaffold(
       backgroundColor: theme.background,
@@ -63,7 +68,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       ),
       child: SafeArea(
-        child: Stack(
+        child: ResponsiveContent(
+          maxWidth: 1280,
+          child: Stack(
           children: [
             CustomScrollView(
               slivers: [
@@ -244,11 +251,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 96),
                     sliver: SliverGrid.builder(
                       gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
+                          SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: gridColumns,
                             mainAxisSpacing: 12,
                             crossAxisSpacing: 12,
-                            childAspectRatio: 1.08,
+                            childAspectRatio: gridAspect,
                           ),
                       itemCount: subjects.length,
                       itemBuilder: (_, index) => SubjectCard(
@@ -300,6 +307,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
           ],
+          ),
         ),
       ),
     );

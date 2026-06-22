@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/responsive.dart';
 import '../../../core/utils/text_metrics.dart';
 import '../../home/providers/home_providers.dart';
 import '../../home/widgets/adaptive_search_field.dart';
@@ -48,7 +49,9 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
         middle: Text('Search'),
       ),
       child: SafeArea(
-        child: Column(
+        child: ResponsiveContent(
+          maxWidth: 1040,
+          child: Column(
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 10),
@@ -97,6 +100,7 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
                     ),
             ),
           ],
+          ),
         ),
       ),
     );
