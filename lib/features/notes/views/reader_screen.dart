@@ -128,7 +128,8 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                 controller: _scroll,
                 slivers: [
                   SliverToBoxAdapter(
-                    child: Center(
+                    child: Align(
+                      alignment: Alignment.topLeft,
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
                           maxWidth: 760.0 * prefs.width,
@@ -165,10 +166,13 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                                   _TocCard(anchors: toc, textColor: textColor),
                                 ],
                                 const SizedBox(height: 22),
-                                SmartFormatterView(
-                                  content: _highlightQuery(chapter.content),
-                                  fontSize: fontSize,
-                                  textColor: textColor,
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: SmartFormatterView(
+                                    content: _highlightQuery(chapter.content),
+                                    fontSize: fontSize,
+                                    textColor: textColor,
+                                  ),
                                 ),
                               ],
                             ),
@@ -269,6 +273,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
               ref
                   .read(chapterRepositoryProvider)
                   .update(chapter.copyWith(favorite: !chapter.favorite));
+              ref.invalidate(chaptersProvider);
               Navigator.pop(context);
             },
             child: Text(chapter.favorite ? 'Remove Favorite' : 'Favorite'),
@@ -278,6 +283,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
               ref
                   .read(chapterRepositoryProvider)
                   .update(chapter.copyWith(pinned: !chapter.pinned));
+              ref.invalidate(chaptersProvider);
               Navigator.pop(context);
             },
             child: Text(chapter.pinned ? 'Unpin' : 'Pin'),

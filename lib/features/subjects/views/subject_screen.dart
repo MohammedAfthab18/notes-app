@@ -104,17 +104,13 @@ class _SubjectScreenState extends ConsumerState<SubjectScreen> {
                       onEdit: () => context.push(
                         '/editor/${widget.subjectId}/${chapter.id}',
                       ),
-                      onDelete: () => ref
-                          .read(chapterRepositoryProvider)
-                          .delete(chapter.id),
-                      onToggleFavorite: () => ref
-                          .read(chapterRepositoryProvider)
-                          .update(
-                            chapter.copyWith(favorite: !chapter.favorite),
-                          ),
-                      onTogglePin: () => ref
-                          .read(chapterRepositoryProvider)
-                          .update(chapter.copyWith(pinned: !chapter.pinned)),
+                      onDelete: () => _deleteChapter(chapter),
+                      onToggleFavorite: () => _updateChapter(
+                        chapter.copyWith(favorite: !chapter.favorite),
+                      ),
+                      onTogglePin: () => _updateChapter(
+                        chapter.copyWith(pinned: !chapter.pinned),
+                      ),
                     ),
                   );
                 },
@@ -184,6 +180,17 @@ class _SubjectScreenState extends ConsumerState<SubjectScreen> {
           title: imported.title,
           content: imported.content,
         );
+    ref.invalidate(chaptersProvider);
     if (mounted) context.push('/editor/${widget.subjectId}/${chapter.id}');
+  }
+
+  Future<void> _updateChapter(Chapter chapter) async {
+    await ref.read(chapterRepositoryProvider).update(chapter);
+    ref.invalidate(chaptersProvider);
+  }
+
+  Future<void> _deleteChapter(Chapter chapter) async {
+    await ref.read(chapterRepositoryProvider).delete(chapter.id);
+    ref.invalidate(chaptersProvider);
   }
 }

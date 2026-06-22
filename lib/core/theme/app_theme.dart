@@ -50,6 +50,23 @@ class AppTheme {
   CupertinoThemeData get cupertinoTheme {
     final baseText =
         GoogleFonts.interTextTheme().bodyMedium?.fontFamily ?? 'Inter';
+    TextStyle appTextStyle({
+      required double fontSize,
+      FontWeight fontWeight = FontWeight.w400,
+      double height = 1.35,
+    }) {
+      return TextStyle(
+        inherit: false,
+        fontFamily: baseText,
+        color: text,
+        fontSize: fontSize,
+        fontWeight: fontWeight,
+        height: height,
+        letterSpacing: 0,
+        decoration: TextDecoration.none,
+      );
+    }
+
     return CupertinoThemeData(
       brightness: isDark ? Brightness.dark : Brightness.light,
       primaryColor: tint,
@@ -57,25 +74,31 @@ class AppTheme {
       barBackgroundColor: background.withValues(alpha: .78),
       textTheme: CupertinoTextThemeData(
         primaryColor: text,
-        textStyle: TextStyle(
-          fontFamily: baseText,
-          color: text,
-          fontSize: 16,
-          height: 1.35,
-        ),
-        navLargeTitleTextStyle: TextStyle(
-          fontFamily: baseText,
-          color: text,
+        textStyle: appTextStyle(fontSize: 16),
+        actionTextStyle: appTextStyle(
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+        ).copyWith(color: tint),
+        actionSmallTextStyle: appTextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+        ).copyWith(color: tint),
+        navActionTextStyle: appTextStyle(
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+        ).copyWith(color: tint),
+        tabLabelTextStyle: appTextStyle(fontSize: 10, height: 1.1),
+        pickerTextStyle: appTextStyle(fontSize: 21, height: 1.25),
+        dateTimePickerTextStyle: appTextStyle(fontSize: 21, height: 1.25),
+        navLargeTitleTextStyle: appTextStyle(
           fontSize: 34,
           fontWeight: FontWeight.w800,
-          letterSpacing: 0,
+          height: 1.16,
         ),
-        navTitleTextStyle: TextStyle(
-          fontFamily: baseText,
-          color: text,
+        navTitleTextStyle: appTextStyle(
           fontSize: 17,
           fontWeight: FontWeight.w700,
-          letterSpacing: 0,
+          height: 1.25,
         ),
       ),
     );

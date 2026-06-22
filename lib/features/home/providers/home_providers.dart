@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -16,25 +15,21 @@ final chapterRepositoryProvider = Provider<ChapterRepository>(
   (ref) => chapterRepository,
 );
 
-final subjectBoxListenableProvider = Provider<ValueListenable<Box<Subject>>>((
-  ref,
-) {
-  return Hive.box<Subject>(AppConstants.subjectBox).listenable();
+final subjectBoxChangesProvider = StreamProvider<BoxEvent>((ref) {
+  return Hive.box<Subject>(AppConstants.subjectBox).watch();
 });
 
-final chapterBoxListenableProvider = Provider<ValueListenable<Box<Chapter>>>((
-  ref,
-) {
-  return Hive.box<Chapter>(AppConstants.chapterBox).listenable();
+final chapterBoxChangesProvider = StreamProvider<BoxEvent>((ref) {
+  return Hive.box<Chapter>(AppConstants.chapterBox).watch();
 });
 
 final subjectsProvider = Provider<List<Subject>>((ref) {
-  ref.watch(subjectBoxListenableProvider);
+  ref.watch(subjectBoxChangesProvider);
   return ref.watch(subjectRepositoryProvider).all();
 });
 
 final chaptersProvider = Provider<List<Chapter>>((ref) {
-  ref.watch(chapterBoxListenableProvider);
+  ref.watch(chapterBoxChangesProvider);
   return ref.watch(chapterRepositoryProvider).all();
 });
 

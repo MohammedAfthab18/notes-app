@@ -9,6 +9,7 @@ final chaptersBySubjectProvider = Provider.family<List<Chapter>, String>((
   ref,
   subjectId,
 ) {
+  ref.watch(chaptersProvider);
   return ref.watch(chapterRepositoryProvider).bySubject(subjectId);
 });
 

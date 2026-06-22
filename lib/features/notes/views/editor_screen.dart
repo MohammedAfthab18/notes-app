@@ -24,6 +24,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   late final TextEditingController _content;
   Timer? _autosave;
   var _preview = false;
+  var _saving = false;
+  var _dirty = false;
   Chapter? _chapter;
 
   @override
@@ -41,7 +43,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   @override
   void dispose() {
     _autosave?.cancel();
-    _save();
+    _save(silent: true);
     _title.dispose();
     _content.dispose();
     super.dispose();
@@ -56,19 +58,59 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         previousPageTitle: 'Chapters',
         middle: Text(_chapter == null ? 'New Chapter' : 'Edit Chapter'),
         trailing: CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: () => setState(() => _preview = !_preview),
-          child: Icon(_preview ? CupertinoIcons.pencil : CupertinoIcons.eye),
+          padding: const EdgeInsets.only(left: 8),
+          minSize: 32,
+          onPressed: _saveNow,
+          child: Text(
+            _saving ? 'Saving...' : (_dirty ? 'Save' : 'Saved'),
+            style: TextStyle(
+              inherit: false,
+              color: _dirty ? theme.tint : theme.secondaryText,
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              decoration: TextDecoration.none,
+            ),
+          ),
         ),
       ),
       child: SafeArea(
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+              child: Row(
+                children: [
+                  CupertinoSlidingSegmentedControl<bool>(
+                    groupValue: _preview,
+                    children: const {
+                      false: Text('Edit'),
+                      true: Text('Preview'),
+                    },
+                    onValueChanged: (value) =>
+                        setState(() => _preview = value ?? _preview),
+                  ),
+                  const Spacer(),
+                  Text(
+                    _saving
+                        ? 'Saving changes'
+                        : (_dirty ? 'Unsaved changes' : 'All changes saved'),
+                    style: TextStyle(
+                      color: theme.secondaryText,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 14, 20, 8),
               child: CupertinoTextField(
                 controller: _title,
                 placeholder: 'Chapter title',
+                textAlign: TextAlign.start,
+                textAlignVertical: TextAlignVertical.center,
+                keyboardType: TextInputType.text,
                 padding: const EdgeInsets.all(16),
                 style: const TextStyle(
                   fontSize: 24,
@@ -88,10 +130,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                     ? SingleChildScrollView(
                         key: const ValueKey('preview'),
                         padding: const EdgeInsets.fromLTRB(24, 18, 24, 80),
-                        child: SmartFormatterView(
-                          content: _content.text,
-                          fontSize: 17,
-                          textColor: theme.text,
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: SmartFormatterView(
+                            content: _content.text,
+                            fontSize: 17,
+                            textColor: theme.text,
+                          ),
                         ),
                       )
                     : Padding(
@@ -104,7 +149,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                           expands: true,
                           maxLines: null,
                           minLines: null,
+                          textAlign: TextAlign.start,
                           textAlignVertical: TextAlignVertical.top,
+                          keyboardType: TextInputType.multiline,
                           padding: const EdgeInsets.all(18),
                           style: TextStyle(
                             fontSize: 17,
@@ -127,17 +174,25 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   }
 
   void _queueSave() {
+    if (!_dirty) setState(() => _dirty = true);
     _autosave?.cancel();
     _autosave = Timer(const Duration(milliseconds: 650), _save);
     if (_preview) setState(() {});
   }
 
-  Future<void> _save() async {
+  Future<void> _saveNow() async {
+    _autosave?.cancel();
+    await _save();
+  }
+
+  Future<void> _save({bool silent = false}) async {
+    if (_saving) return;
     final title = _title.text.trim().isEmpty
         ? 'Untitled Note'
         : _title.text.trim();
     if (_chapter == null) {
       if (_content.text.trim().isEmpty && _title.text.trim().isEmpty) return;
+      if (!silent && mounted) setState(() => _saving = true);
       _chapter = await ref
           .read(chapterRepositoryProvider)
           .create(
@@ -145,10 +200,27 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
             title: title,
             content: _content.text,
           );
+      ref.invalidate(chaptersProvider);
+      ref.invalidate(chapterByIdProvider(_chapter!.id));
+      if (!silent && mounted) {
+        setState(() {
+          _saving = false;
+          _dirty = false;
+        });
+      }
       return;
     }
+    if (!silent && mounted) setState(() => _saving = true);
     await ref
         .read(chapterRepositoryProvider)
         .update(_chapter!.copyWith(title: title, content: _content.text));
+    ref.invalidate(chaptersProvider);
+    ref.invalidate(chapterByIdProvider(_chapter!.id));
+    if (!silent && mounted) {
+      setState(() {
+        _saving = false;
+        _dirty = false;
+      });
+    }
   }
 }

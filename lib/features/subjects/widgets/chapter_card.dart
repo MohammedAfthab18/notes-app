@@ -27,47 +27,12 @@ class ChapterCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ref.watch(appThemeProvider);
-    return CupertinoContextMenu(
-      actions: [
-        CupertinoContextMenuAction(
-          onPressed: () {
-            Navigator.pop(context);
-            onEdit();
-          },
-          trailingIcon: CupertinoIcons.pencil,
-          child: const Text('Edit'),
-        ),
-        CupertinoContextMenuAction(
-          onPressed: () {
-            Navigator.pop(context);
-            onToggleFavorite();
-          },
-          trailingIcon: chapter.favorite
-              ? CupertinoIcons.star_fill
-              : CupertinoIcons.star,
-          child: Text(chapter.favorite ? 'Unfavorite' : 'Favorite'),
-        ),
-        CupertinoContextMenuAction(
-          onPressed: () {
-            Navigator.pop(context);
-            onTogglePin();
-          },
-          trailingIcon: chapter.pinned
-              ? CupertinoIcons.pin_slash
-              : CupertinoIcons.pin,
-          child: Text(chapter.pinned ? 'Unpin' : 'Pin'),
-        ),
-        CupertinoContextMenuAction(
-          isDestructiveAction: true,
-          onPressed: () {
-            Navigator.pop(context);
-            onDelete();
-          },
-          trailingIcon: CupertinoIcons.delete,
-          child: const Text('Delete'),
-        ),
-      ],
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onLongPress: () => _showChapterActions(context),
       child: GlassSurface(
+        padding: const EdgeInsets.all(14),
+        radius: 18,
         onTap: onTap,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,7 +46,7 @@ class ChapterCard extends ConsumerWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: theme.text,
-                      fontSize: 19,
+                      fontSize: 17,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -99,14 +64,18 @@ class ChapterCard extends ConsumerWidget {
                   ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             Text(
-              previewText(stripMarkdown(chapter.content), max: 128),
-              maxLines: 2,
+              previewText(stripMarkdown(chapter.content), max: 104),
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: theme.secondaryText, height: 1.35),
+              style: TextStyle(
+                color: theme.secondaryText,
+                height: 1.3,
+                fontSize: 13,
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Row(
               children: [
                 Icon(
@@ -127,6 +96,84 @@ class ChapterCard extends ConsumerWidget {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  void _showChapterActions(BuildContext context) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        title: Text(chapter.title),
+        actions: [
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(context);
+              onEdit();
+            },
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(CupertinoIcons.pencil, size: 20),
+                SizedBox(width: 8),
+                Text('Edit'),
+              ],
+            ),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(context);
+              onToggleFavorite();
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  chapter.favorite ? CupertinoIcons.star_fill : CupertinoIcons.star,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Text(chapter.favorite ? 'Unfavorite' : 'Favorite'),
+              ],
+            ),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(context);
+              onTogglePin();
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  chapter.pinned ? CupertinoIcons.pin_slash : CupertinoIcons.pin,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Text(chapter.pinned ? 'Unpin' : 'Pin'),
+              ],
+            ),
+          ),
+          CupertinoActionSheetAction(
+            isDestructiveAction: true,
+            onPressed: () {
+              Navigator.pop(context);
+              onDelete();
+            },
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(CupertinoIcons.delete, size: 20),
+                SizedBox(width: 8),
+                Text('Delete'),
+              ],
+            ),
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
         ),
       ),
     );
