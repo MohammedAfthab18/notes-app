@@ -17,9 +17,9 @@ class BackupService {
     final file = File(
       '${dir.path}/noteshub-backup-${DateTime.now().millisecondsSinceEpoch}.json',
     );
-    await file.writeAsString(const JsonEncoder.withIndent('  ').convert(
-      _payload(subjects, chapters),
-    ));
+    await file.writeAsString(
+      const JsonEncoder.withIndent('  ').convert(_payload(subjects, chapters)),
+    );
     return file.path;
   }
 

@@ -54,71 +54,71 @@ class _SubjectScreenState extends ConsumerState<SubjectScreen> {
         child: ResponsiveContent(
           maxWidth: 1100,
           child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 18, 20, 10),
-                child: Column(
-                  children: [
-                    AdaptiveSearchField(
-                      controller: _search,
-                      placeholder: 'Search chapters',
-                      onChanged: (_) => setState(() {}),
-                    ),
-                    const SizedBox(height: 12),
-                    CupertinoSlidingSegmentedControl<ChapterSort>(
-                      groupValue: _sort,
-                      children: const {
-                        ChapterSort.updated: Text('Date'),
-                        ChapterSort.name: Text('Name'),
-                      },
-                      onValueChanged: (value) =>
-                          setState(() => _sort = value ?? _sort),
-                    ),
-                  ],
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 10),
+                  child: Column(
+                    children: [
+                      AdaptiveSearchField(
+                        controller: _search,
+                        placeholder: 'Search chapters',
+                        onChanged: (_) => setState(() {}),
+                      ),
+                      const SizedBox(height: 12),
+                      CupertinoSlidingSegmentedControl<ChapterSort>(
+                        groupValue: _sort,
+                        children: const {
+                          ChapterSort.updated: Text('Date'),
+                          ChapterSort.name: Text('Name'),
+                        },
+                        onValueChanged: (value) =>
+                            setState(() => _sort = value ?? _sort),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            if (chapters.isEmpty)
-              const SliverFillRemaining(
-                child: EmptyState(
-                  icon: CupertinoIcons.doc_text,
-                  title: 'No chapters yet',
-                  message: 'Paste notes or import a .txt/.docx file.',
+              if (chapters.isEmpty)
+                const SliverFillRemaining(
+                  child: EmptyState(
+                    icon: CupertinoIcons.doc_text,
+                    title: 'No chapters yet',
+                    message: 'Paste notes or import a .txt/.docx file.',
+                  ),
+                )
+              else
+                SliverList.separated(
+                  itemCount: chapters.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 14),
+                  itemBuilder: (_, index) {
+                    final chapter = chapters[index];
+                    return Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        20,
+                        index == 0 ? 4 : 0,
+                        20,
+                        index == chapters.length - 1 ? 96 : 0,
+                      ),
+                      child: ChapterCard(
+                        chapter: chapter,
+                        onTap: () => context.push('/reader/${chapter.id}'),
+                        onEdit: () => context.push(
+                          '/editor/${widget.subjectId}/${chapter.id}',
+                        ),
+                        onDelete: () => _deleteChapter(chapter),
+                        onToggleFavorite: () => _updateChapter(
+                          chapter.copyWith(favorite: !chapter.favorite),
+                        ),
+                        onTogglePin: () => _updateChapter(
+                          chapter.copyWith(pinned: !chapter.pinned),
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              )
-            else
-              SliverList.separated(
-                itemCount: chapters.length,
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 14),
-                itemBuilder: (_, index) {
-                  final chapter = chapters[index];
-                  return Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      20,
-                      index == 0 ? 4 : 0,
-                      20,
-                      index == chapters.length - 1 ? 96 : 0,
-                    ),
-                    child: ChapterCard(
-                      chapter: chapter,
-                      onTap: () => context.push('/reader/${chapter.id}'),
-                      onEdit: () => context.push(
-                        '/editor/${widget.subjectId}/${chapter.id}',
-                      ),
-                      onDelete: () => _deleteChapter(chapter),
-                      onToggleFavorite: () => _updateChapter(
-                        chapter.copyWith(favorite: !chapter.favorite),
-                      ),
-                      onTogglePin: () => _updateChapter(
-                        chapter.copyWith(pinned: !chapter.pinned),
-                      ),
-                    ),
-                  );
-                },
-              ),
-          ],
+            ],
           ),
         ),
       ),

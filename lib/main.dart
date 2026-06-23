@@ -31,11 +31,13 @@ class NotesHubApp extends ConsumerStatefulWidget {
 }
 
 class _NotesHubAppState extends ConsumerState<NotesHubApp> {
+  ProviderSubscription<AsyncValue<dynamic>>? _authSubscription;
+
   @override
   void initState() {
     super.initState();
     if (ref.read(firebaseEnabledProvider)) {
-      ref.listen(authStateProvider, (previous, next) {
+      _authSubscription = ref.listenManual(authStateProvider, (previous, next) {
         next.whenData((user) {
           if (user != null) {
             unawaited(cloudSyncService.bootstrapUser(user));
@@ -43,6 +45,12 @@ class _NotesHubAppState extends ConsumerState<NotesHubApp> {
         });
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _authSubscription?.close();
+    super.dispose();
   }
 
   @override

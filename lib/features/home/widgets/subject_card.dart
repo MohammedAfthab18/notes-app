@@ -24,7 +24,6 @@ class SubjectCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = ref.watch(appThemeProvider);
     final count = ref.watch(subjectChapterCountProvider(subject.id));
     final updated =
         ref.watch(subjectLastUpdatedProvider(subject.id)) ?? subject.updatedAt;
@@ -145,7 +144,11 @@ class _SubjectListContent extends ConsumerWidget {
           ),
         ),
         const SizedBox(width: 8),
-        Icon(CupertinoIcons.chevron_forward, color: theme.secondaryText, size: 16),
+        Icon(
+          CupertinoIcons.chevron_forward,
+          color: theme.secondaryText,
+          size: 16,
+        ),
       ],
     );
   }

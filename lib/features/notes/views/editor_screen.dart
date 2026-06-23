@@ -60,7 +60,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         middle: Text(_chapter == null ? 'New Chapter' : 'Edit Chapter'),
         trailing: CupertinoButton(
           padding: const EdgeInsets.only(left: 8),
-          minSize: 32,
+          minimumSize: const Size(32, 32),
           onPressed: _saveNow,
           child: Text(
             _saving ? 'Saving...' : (_dirty ? 'Save' : 'Saved'),
@@ -78,99 +78,99 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         child: ResponsiveContent(
           maxWidth: 1200,
           child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-              child: Row(
-                children: [
-                  CupertinoSlidingSegmentedControl<bool>(
-                    groupValue: _preview,
-                    children: const {
-                      false: Text('Edit'),
-                      true: Text('Preview'),
-                    },
-                    onValueChanged: (value) =>
-                        setState(() => _preview = value ?? _preview),
-                  ),
-                  const Spacer(),
-                  Text(
-                    _saving
-                        ? 'Saving changes'
-                        : (_dirty ? 'Unsaved changes' : 'All changes saved'),
-                    style: TextStyle(
-                      color: theme.secondaryText,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                child: Row(
+                  children: [
+                    CupertinoSlidingSegmentedControl<bool>(
+                      groupValue: _preview,
+                      children: const {
+                        false: Text('Edit'),
+                        true: Text('Preview'),
+                      },
+                      onValueChanged: (value) =>
+                          setState(() => _preview = value ?? _preview),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 14, 20, 8),
-              child: CupertinoTextField(
-                controller: _title,
-                placeholder: 'Chapter title',
-                textAlign: TextAlign.start,
-                textAlignVertical: TextAlignVertical.center,
-                keyboardType: TextInputType.text,
-                padding: const EdgeInsets.all(16),
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
-                ),
-                decoration: BoxDecoration(
-                  color: theme.glass,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: theme.hairline),
-                ),
-              ),
-            ),
-            Expanded(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 220),
-                child: _preview
-                    ? SingleChildScrollView(
-                        key: const ValueKey('preview'),
-                        padding: const EdgeInsets.fromLTRB(24, 18, 24, 80),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: SmartFormatterView(
-                            content: _content.text,
-                            fontSize: 17,
-                            textColor: theme.text,
-                          ),
-                        ),
-                      )
-                    : Padding(
-                        key: const ValueKey('editor'),
-                        padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-                        child: CupertinoTextField(
-                          controller: _content,
-                          placeholder:
-                              'Paste notes, Markdown, code, tables, links, or formulas...',
-                          expands: true,
-                          maxLines: null,
-                          minLines: null,
-                          textAlign: TextAlign.start,
-                          textAlignVertical: TextAlignVertical.top,
-                          keyboardType: TextInputType.multiline,
-                          padding: const EdgeInsets.all(18),
-                          style: TextStyle(
-                            fontSize: 17,
-                            height: 1.65,
-                            color: theme.text,
-                          ),
-                          decoration: BoxDecoration(
-                            color: theme.glass,
-                            borderRadius: BorderRadius.circular(24),
-                            border: Border.all(color: theme.hairline),
-                          ),
-                        ),
+                    const Spacer(),
+                    Text(
+                      _saving
+                          ? 'Saving changes'
+                          : (_dirty ? 'Unsaved changes' : 'All changes saved'),
+                      style: TextStyle(
+                        color: theme.secondaryText,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
                       ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 14, 20, 8),
+                child: CupertinoTextField(
+                  controller: _title,
+                  placeholder: 'Chapter title',
+                  textAlign: TextAlign.start,
+                  textAlignVertical: TextAlignVertical.center,
+                  keyboardType: TextInputType.text,
+                  padding: const EdgeInsets.all(16),
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                  ),
+                  decoration: BoxDecoration(
+                    color: theme.glass,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: theme.hairline),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 220),
+                  child: _preview
+                      ? SingleChildScrollView(
+                          key: const ValueKey('preview'),
+                          padding: const EdgeInsets.fromLTRB(24, 18, 24, 80),
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child: SmartFormatterView(
+                              content: _content.text,
+                              fontSize: 17,
+                              textColor: theme.text,
+                            ),
+                          ),
+                        )
+                      : Padding(
+                          key: const ValueKey('editor'),
+                          padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+                          child: CupertinoTextField(
+                            controller: _content,
+                            placeholder:
+                                'Paste notes, Markdown, code, tables, links, or formulas...',
+                            expands: true,
+                            maxLines: null,
+                            minLines: null,
+                            textAlign: TextAlign.start,
+                            textAlignVertical: TextAlignVertical.top,
+                            keyboardType: TextInputType.multiline,
+                            padding: const EdgeInsets.all(18),
+                            style: TextStyle(
+                              fontSize: 17,
+                              height: 1.65,
+                              color: theme.text,
+                            ),
+                            decoration: BoxDecoration(
+                              color: theme.glass,
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(color: theme.hairline),
+                            ),
+                          ),
+                        ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

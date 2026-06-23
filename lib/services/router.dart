@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -22,8 +21,9 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     initialLocation: '/',
-    refreshListenable:
-        firebaseEnabled ? _GoRouterRefreshStream(auth!.authStateChanges()) : null,
+    refreshListenable: firebaseEnabled
+        ? _GoRouterRefreshStream(auth!.authStateChanges())
+        : null,
     redirect: (context, state) {
       if (!firebaseEnabled) return null;
       final user = auth!.currentUser;
@@ -33,10 +33,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/auth',
-        pageBuilder: _page((state) => const AuthScreen()),
-      ),
+      GoRoute(path: '/auth', pageBuilder: _page((state) => const AuthScreen())),
       GoRoute(path: '/', pageBuilder: _page((state) => const HomeScreen())),
       GoRoute(
         path: '/subject/:id',

@@ -32,82 +32,82 @@ class SettingsScreen extends ConsumerWidget {
         child: ResponsiveContent(
           maxWidth: 760,
           child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
-          children: [
-            _Group(
-              title: 'Appearance',
-              children: [
-                CupertinoSlidingSegmentedControl<AppAppearance>(
-                  groupValue: appearance,
-                  children: const {
-                    AppAppearance.system: Text('System'),
-                    AppAppearance.light: Text('Light'),
-                    AppAppearance.dark: Text('Dark'),
-                  },
-                  onValueChanged: (value) {
-                    if (value == null) return;
-                    box.put('appearance', value.name);
-                    ref.invalidate(appThemeProvider);
-                  },
-                ),
-              ],
-            ),
-            _Group(
-              title: 'Backup',
-              children: [
-                _Row(
-                  title: 'Export JSON',
-                  icon: CupertinoIcons.square_arrow_up,
-                  onTap: () async {
-                    final target = await BackupService().exportJson(
-                      ref.read(subjectsProvider),
-                      ref.read(chaptersProvider),
-                    );
-                    if (context.mounted) _toast(context, 'Saved $target');
-                  },
-                ),
-                _Row(
-                  title: 'Export TXT',
-                  icon: CupertinoIcons.doc_plaintext,
-                  onTap: () async {
-                    final target = await BackupService().exportTxt(
-                      ref.read(chaptersProvider),
-                    );
-                    if (context.mounted) _toast(context, 'Saved $target');
-                  },
-                ),
-                _Row(
-                  title: 'Restore JSON',
-                  icon: CupertinoIcons.arrow_down_doc,
-                  onTap: () => BackupService().restoreJson(),
-                ),
-              ],
-            ),
-            _Group(
-              title: 'About',
-              children: const [
-                _StaticRow(title: 'NotesHub', value: 'Offline study notes'),
-                _StaticRow(title: 'Storage', value: 'Hive local database'),
-                _StaticRow(title: 'Version', value: '1.0.0'),
-              ],
-            ),
-            _Group(
-              title: 'Maintenance',
-              children: [
-                if (firebaseEnabled)
-                  _Row(
-                    title: 'Sign out',
-                    icon: CupertinoIcons.square_arrow_right,
-                    onTap: () => authService.signOut(),
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
+            children: [
+              _Group(
+                title: 'Appearance',
+                children: [
+                  CupertinoSlidingSegmentedControl<AppAppearance>(
+                    groupValue: appearance,
+                    children: const {
+                      AppAppearance.system: Text('System'),
+                      AppAppearance.light: Text('Light'),
+                      AppAppearance.dark: Text('Dark'),
+                    },
+                    onValueChanged: (value) {
+                      if (value == null) return;
+                      box.put('appearance', value.name);
+                      ref.invalidate(appThemeProvider);
+                    },
                   ),
-                _Row(
-                  title: 'Clear cache',
-                  icon: CupertinoIcons.clear,
-                  onTap: () => _toast(context, 'Cache cleared'),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+              _Group(
+                title: 'Backup',
+                children: [
+                  _Row(
+                    title: 'Export JSON',
+                    icon: CupertinoIcons.square_arrow_up,
+                    onTap: () async {
+                      final target = await BackupService().exportJson(
+                        ref.read(subjectsProvider),
+                        ref.read(chaptersProvider),
+                      );
+                      if (context.mounted) _toast(context, 'Saved $target');
+                    },
+                  ),
+                  _Row(
+                    title: 'Export TXT',
+                    icon: CupertinoIcons.doc_plaintext,
+                    onTap: () async {
+                      final target = await BackupService().exportTxt(
+                        ref.read(chaptersProvider),
+                      );
+                      if (context.mounted) _toast(context, 'Saved $target');
+                    },
+                  ),
+                  _Row(
+                    title: 'Restore JSON',
+                    icon: CupertinoIcons.arrow_down_doc,
+                    onTap: () => BackupService().restoreJson(),
+                  ),
+                ],
+              ),
+              _Group(
+                title: 'About',
+                children: const [
+                  _StaticRow(title: 'NotesHub', value: 'Offline study notes'),
+                  _StaticRow(title: 'Storage', value: 'Hive local database'),
+                  _StaticRow(title: 'Version', value: '1.0.0'),
+                ],
+              ),
+              _Group(
+                title: 'Maintenance',
+                children: [
+                  if (firebaseEnabled)
+                    _Row(
+                      title: 'Sign out',
+                      icon: CupertinoIcons.square_arrow_right,
+                      onTap: () => authService.signOut(),
+                    ),
+                  _Row(
+                    title: 'Clear cache',
+                    icon: CupertinoIcons.clear,
+                    onTap: () => _toast(context, 'Cache cleared'),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),

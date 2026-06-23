@@ -52,54 +52,56 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
         child: ResponsiveContent(
           maxWidth: 1040,
           child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 18, 20, 10),
-              child: AdaptiveSearchField(
-                controller: _query,
-                placeholder: 'Search everything',
-                onChanged: (_) => setState(() {}),
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 18, 20, 10),
+                child: AdaptiveSearchField(
+                  controller: _query,
+                  placeholder: 'Search everything',
+                  onChanged: (_) => setState(() {}),
+                ),
               ),
-            ),
-            Expanded(
-              child: q.isEmpty
-                  ? const EmptyState(
-                      icon: CupertinoIcons.search,
-                      title: 'Instant global search',
-                      message: 'Find subjects, chapters, and note content.',
-                    )
-                  : ListView(
-                      padding: const EdgeInsets.fromLTRB(20, 6, 20, 40),
-                      children: [
-                        if (subjects.isNotEmpty) _label('Subjects', theme),
-                        for (final subject in subjects)
-                          _SearchTile(
-                            title: subject.title,
-                            subtitle: 'Subject',
-                            icon: CupertinoIcons.folder_fill,
-                            onTap: () => context.push('/subject/${subject.id}'),
-                          ),
-                        if (chapters.isNotEmpty) _label('Chapters', theme),
-                        for (final chapter in chapters)
-                          _SearchTile(
-                            title: chapter.title,
-                            subtitle: previewText(
-                              stripMarkdown(chapter.content),
-                              max: 96,
+              Expanded(
+                child: q.isEmpty
+                    ? const EmptyState(
+                        icon: CupertinoIcons.search,
+                        title: 'Instant global search',
+                        message: 'Find subjects, chapters, and note content.',
+                      )
+                    : ListView(
+                        padding: const EdgeInsets.fromLTRB(20, 6, 20, 40),
+                        children: [
+                          if (subjects.isNotEmpty) _label('Subjects', theme),
+                          for (final subject in subjects)
+                            _SearchTile(
+                              title: subject.title,
+                              subtitle: 'Subject',
+                              icon: CupertinoIcons.folder_fill,
+                              onTap: () =>
+                                  context.push('/subject/${subject.id}'),
                             ),
-                            icon: CupertinoIcons.doc_text_fill,
-                            onTap: () => context.push('/reader/${chapter.id}'),
-                          ),
-                        if (subjects.isEmpty && chapters.isEmpty)
-                          const EmptyState(
-                            icon: CupertinoIcons.xmark_circle,
-                            title: 'No results',
-                            message: 'Try a different keyword.',
-                          ),
-                      ],
-                    ),
-            ),
-          ],
+                          if (chapters.isNotEmpty) _label('Chapters', theme),
+                          for (final chapter in chapters)
+                            _SearchTile(
+                              title: chapter.title,
+                              subtitle: previewText(
+                                stripMarkdown(chapter.content),
+                                max: 96,
+                              ),
+                              icon: CupertinoIcons.doc_text_fill,
+                              onTap: () =>
+                                  context.push('/reader/${chapter.id}'),
+                            ),
+                          if (subjects.isEmpty && chapters.isEmpty)
+                            const EmptyState(
+                              icon: CupertinoIcons.xmark_circle,
+                              title: 'No results',
+                              message: 'Try a different keyword.',
+                            ),
+                        ],
+                      ),
+              ),
+            ],
           ),
         ),
       ),

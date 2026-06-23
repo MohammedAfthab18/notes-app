@@ -38,7 +38,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final recents = ref.watch(recentChaptersProvider);
     final recentCount = recents.length > 4 ? 4 : recents.length;
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final isDesktop = responsiveClassForWidth(screenWidth) == ResponsiveClass.desktop;
+    final isDesktop =
+        responsiveClassForWidth(screenWidth) == ResponsiveClass.desktop;
     final gridColumns = isDesktop ? 3 : 2;
     final gridAspect = isDesktop ? 1.02 : 1.08;
 
@@ -71,242 +72,246 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: ResponsiveContent(
           maxWidth: 1280,
           child: Stack(
-          children: [
-            CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Your knowledge, beautifully offline.',
-                          style: TextStyle(
-                            color: theme.secondaryText,
-                            fontSize: 15,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        AdaptiveSearchField(
-                          controller: _search,
-                          placeholder: 'Search subjects',
-                          onChanged: (_) => setState(() {}),
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            CupertinoSlidingSegmentedControl<SubjectSort>(
-                              groupValue: _sort,
-                              children: const {
-                                SubjectSort.custom: Text('Custom'),
-                                SubjectSort.az: Text('A-Z'),
-                                SubjectSort.updated: Text('Updated'),
-                              },
-                              onValueChanged: (value) =>
-                                  setState(() => _sort = value ?? _sort),
-                            ),
-                            const Spacer(),
-                            CupertinoButton(
-                              padding: const EdgeInsets.all(8),
-                              onPressed: () => setState(() => _grid = !_grid),
-                              child: Icon(
-                                _grid
-                                    ? CupertinoIcons.list_bullet
-                                    : CupertinoIcons.square_grid_2x2,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                if (recents.isNotEmpty)
+            children: [
+              CustomScrollView(
+                slivers: [
                   SliverToBoxAdapter(
-                    child: SectionHeader(
-                      title: 'Recent Notes',
-                      trailing: Text(
-                        '$recentCount',
-                        style: TextStyle(color: theme.secondaryText),
-                      ),
-                    ),
-                  ),
-                if (recents.isNotEmpty)
-                  SliverList.separated(
-                    itemCount: recentCount,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 10),
-                    itemBuilder: (context, index) {
-                      final chapter = recents[index];
-                      return Padding(
-                        padding: EdgeInsets.fromLTRB(
-                          20,
-                          index == 0 ? 0 : 0,
-                          20,
-                          index == recentCount - 1 ? 10 : 0,
-                        ),
-                        child: GlassSurface(
-                          padding: const EdgeInsets.all(12),
-                          radius: 18,
-                          onTap: () => context.push('/reader/${chapter.id}'),
-                          child: Row(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Your knowledge, beautifully offline.',
+                            style: TextStyle(
+                              color: theme.secondaryText,
+                              fontSize: 15,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          AdaptiveSearchField(
+                            controller: _search,
+                            placeholder: 'Search subjects',
+                            onChanged: (_) => setState(() {}),
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
                             children: [
-                              Container(
-                                width: 38,
-                                height: 38,
-                                decoration: BoxDecoration(
-                                  color: theme.mint.withValues(alpha: .14),
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
+                              CupertinoSlidingSegmentedControl<SubjectSort>(
+                                groupValue: _sort,
+                                children: const {
+                                  SubjectSort.custom: Text('Custom'),
+                                  SubjectSort.az: Text('A-Z'),
+                                  SubjectSort.updated: Text('Updated'),
+                                },
+                                onValueChanged: (value) =>
+                                    setState(() => _sort = value ?? _sort),
+                              ),
+                              const Spacer(),
+                              CupertinoButton(
+                                padding: const EdgeInsets.all(8),
+                                onPressed: () => setState(() => _grid = !_grid),
                                 child: Icon(
-                                  CupertinoIcons.clock,
-                                  color: theme.mint,
-                                  size: 19,
+                                  _grid
+                                      ? CupertinoIcons.list_bullet
+                                      : CupertinoIcons.square_grid_2x2,
                                 ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      chapter.title,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        color: theme.text,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'Recently opened',
-                                      style: TextStyle(
-                                        color: theme.secondaryText,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Icon(
-                                CupertinoIcons.chevron_forward,
-                                color: theme.secondaryText,
-                                size: 15,
                               ),
                             ],
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                if (favorites.isNotEmpty)
-                  SliverToBoxAdapter(
-                    child: SectionHeader(
-                      title: 'Favorites',
-                      trailing: Text(
-                        '${favorites.length}',
-                        style: TextStyle(color: theme.secondaryText),
+                        ],
                       ),
                     ),
                   ),
-                if (favorites.isNotEmpty)
-                  SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: 56,
-                      child: ListView.separated(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        scrollDirection: Axis.horizontal,
-                        itemCount: favorites.length,
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(width: 10),
-                        itemBuilder: (context, index) => CupertinoButton.filled(
-                          borderRadius: BorderRadius.circular(18),
-                          padding: const EdgeInsets.symmetric(horizontal: 14),
-                          onPressed: () =>
-                              context.push('/reader/${favorites[index].id}'),
-                          child: Text(
-                            favorites[index].title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                  if (recents.isNotEmpty)
+                    SliverToBoxAdapter(
+                      child: SectionHeader(
+                        title: 'Recent Notes',
+                        trailing: Text(
+                          '$recentCount',
+                          style: TextStyle(color: theme.secondaryText),
                         ),
                       ),
                     ),
-                  ),
-                SliverToBoxAdapter(child: SectionHeader(title: 'Subjects')),
-                if (subjects.isEmpty)
-                  const SliverFillRemaining(
-                    child: EmptyState(
-                      icon: CupertinoIcons.folder,
-                      title: 'No subjects available',
-                      message: 'Tap + to create your first subject.',
-                    ),
-                  )
-                else if (_grid)
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 96),
-                    sliver: SliverGrid.builder(
-                      gridDelegate:
-                          SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: gridColumns,
-                            mainAxisSpacing: 12,
-                            crossAxisSpacing: 12,
-                            childAspectRatio: gridAspect,
+                  if (recents.isNotEmpty)
+                    SliverList.separated(
+                      itemCount: recentCount,
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 10),
+                      itemBuilder: (context, index) {
+                        final chapter = recents[index];
+                        return Padding(
+                          padding: EdgeInsets.fromLTRB(
+                            20,
+                            index == 0 ? 0 : 0,
+                            20,
+                            index == recentCount - 1 ? 10 : 0,
                           ),
+                          child: GlassSurface(
+                            padding: const EdgeInsets.all(12),
+                            radius: 18,
+                            onTap: () => context.push('/reader/${chapter.id}'),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 38,
+                                  height: 38,
+                                  decoration: BoxDecoration(
+                                    color: theme.mint.withValues(alpha: .14),
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  child: Icon(
+                                    CupertinoIcons.clock,
+                                    color: theme.mint,
+                                    size: 19,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        chapter.title,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: theme.text,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'Recently opened',
+                                        style: TextStyle(
+                                          color: theme.secondaryText,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Icon(
+                                  CupertinoIcons.chevron_forward,
+                                  color: theme.secondaryText,
+                                  size: 15,
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  if (favorites.isNotEmpty)
+                    SliverToBoxAdapter(
+                      child: SectionHeader(
+                        title: 'Favorites',
+                        trailing: Text(
+                          '${favorites.length}',
+                          style: TextStyle(color: theme.secondaryText),
+                        ),
+                      ),
+                    ),
+                  if (favorites.isNotEmpty)
+                    SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: 56,
+                        child: ListView.separated(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          scrollDirection: Axis.horizontal,
+                          itemCount: favorites.length,
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(width: 10),
+                          itemBuilder: (context, index) =>
+                              CupertinoButton.filled(
+                                borderRadius: BorderRadius.circular(18),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                ),
+                                onPressed: () => context.push(
+                                  '/reader/${favorites[index].id}',
+                                ),
+                                child: Text(
+                                  favorites[index].title,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                        ),
+                      ),
+                    ),
+                  SliverToBoxAdapter(child: SectionHeader(title: 'Subjects')),
+                  if (subjects.isEmpty)
+                    const SliverFillRemaining(
+                      child: EmptyState(
+                        icon: CupertinoIcons.folder,
+                        title: 'No subjects available',
+                        message: 'Tap + to create your first subject.',
+                      ),
+                    )
+                  else if (_grid)
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 96),
+                      sliver: SliverGrid.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: gridColumns,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                          childAspectRatio: gridAspect,
+                        ),
+                        itemCount: subjects.length,
+                        itemBuilder: (_, index) => SubjectCard(
+                          subject: subjects[index],
+                          onTap: () =>
+                              context.push('/subject/${subjects[index].id}'),
+                          onRename: () => _rename(subjects[index]),
+                          onDelete: () => _delete(subjects[index]),
+                        ),
+                      ),
+                    )
+                  else
+                    SliverReorderableList(
                       itemCount: subjects.length,
-                      itemBuilder: (_, index) => SubjectCard(
-                        subject: subjects[index],
-                        onTap: () =>
-                            context.push('/subject/${subjects[index].id}'),
-                        onRename: () => _rename(subjects[index]),
-                        onDelete: () => _delete(subjects[index]),
+                      itemBuilder: (_, index) => Padding(
+                        key: ValueKey(subjects[index].id),
+                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
+                        child: SubjectCard(
+                          subject: subjects[index],
+                          onTap: () =>
+                              context.push('/subject/${subjects[index].id}'),
+                          onRename: () => _rename(subjects[index]),
+                          onDelete: () => _delete(subjects[index]),
+                          listTile: true,
+                        ),
                       ),
+                      onReorder: (oldIndex, newIndex) {
+                        final reordered = [...ref.read(subjectsProvider)];
+                        if (newIndex > oldIndex) newIndex--;
+                        final item = reordered.removeAt(oldIndex);
+                        reordered.insert(newIndex, item);
+                        ref.read(subjectRepositoryProvider).reorder(reordered);
+                      },
                     ),
-                  )
-                else
-                  SliverReorderableList(
-                    itemCount: subjects.length,
-                    itemBuilder: (_, index) => Padding(
-                      key: ValueKey(subjects[index].id),
-                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
-                      child: SubjectCard(
-                        subject: subjects[index],
-                        onTap: () =>
-                            context.push('/subject/${subjects[index].id}'),
-                        onRename: () => _rename(subjects[index]),
-                        onDelete: () => _delete(subjects[index]),
-                        listTile: true,
-                      ),
-                    ),
-                    onReorder: (oldIndex, newIndex) {
-                      final reordered = [...ref.read(subjectsProvider)];
-                      if (newIndex > oldIndex) newIndex--;
-                      final item = reordered.removeAt(oldIndex);
-                      reordered.insert(newIndex, item);
-                      ref.read(subjectRepositoryProvider).reorder(reordered);
-                    },
+                ],
+              ),
+              Positioned(
+                right: 22,
+                bottom: 24,
+                child: CupertinoButton(
+                  borderRadius: BorderRadius.circular(24),
+                  color: theme.tint,
+                  padding: const EdgeInsets.all(18),
+                  onPressed: _createSubject,
+                  child: const Icon(
+                    CupertinoIcons.add,
+                    color: CupertinoColors.white,
                   ),
-              ],
-            ),
-            Positioned(
-              right: 22,
-              bottom: 24,
-              child: CupertinoButton(
-                borderRadius: BorderRadius.circular(24),
-                color: theme.tint,
-                padding: const EdgeInsets.all(18),
-                onPressed: _createSubject,
-                child: const Icon(
-                  CupertinoIcons.add,
-                  color: CupertinoColors.white,
                 ),
               ),
-            ),
-          ],
+            ],
           ),
         ),
       ),

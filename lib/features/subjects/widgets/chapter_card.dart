@@ -130,7 +130,9 @@ class ChapterCard extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  chapter.favorite ? CupertinoIcons.star_fill : CupertinoIcons.star,
+                  chapter.favorite
+                      ? CupertinoIcons.star_fill
+                      : CupertinoIcons.star,
                   size: 20,
                 ),
                 const SizedBox(width: 8),
@@ -147,7 +149,9 @@ class ChapterCard extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  chapter.pinned ? CupertinoIcons.pin_slash : CupertinoIcons.pin,
+                  chapter.pinned
+                      ? CupertinoIcons.pin_slash
+                      : CupertinoIcons.pin,
                   size: 20,
                 ),
                 const SizedBox(width: 8),

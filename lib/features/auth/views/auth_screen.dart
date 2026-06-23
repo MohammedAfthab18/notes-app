@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../../../core/utils/responsive.dart';
 import '../providers/auth_providers.dart';
 
 enum AuthMode { signIn, signUp }
@@ -43,92 +42,55 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final firebaseEnabled = ref.watch(firebaseEnabledProvider);
 
     return CupertinoPageScaffold(
-      backgroundColor: theme.background,
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    theme.tint.withValues(alpha: .08),
-                    theme.mint.withValues(alpha: .08),
-                    theme.background,
-                  ],
+      backgroundColor: const Color(0xFF050505),
+      child: SafeArea(
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 430),
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(28, 20, 28, 34),
+              children: [
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: CupertinoButton(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 8,
+                    ),
+                    onPressed: firebaseEnabled ? () => context.go('/') : null,
+                    child: const Text(
+                      'Skip',
+                      style: TextStyle(
+                        color: Color(0xFF8E8E93),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(height: 18),
+                _FormPane(
+                  theme: theme,
+                  firebaseEnabled: firebaseEnabled,
+                  mode: _mode,
+                  busy: _busy,
+                  hidePassword: _hidePassword,
+                  nameController: _name,
+                  emailController: _email,
+                  passwordController: _password,
+                  confirmController: _confirm,
+                  error: _error.value,
+                  onModeChanged: (mode) => setState(() => _mode = mode),
+                  onTogglePassword: () =>
+                      setState(() => _hidePassword = !_hidePassword),
+                  onPrimaryAction: _submit,
+                  onGoogle: _googleSignIn,
+                ),
+              ],
             ),
           ),
-          SafeArea(
-            child: ResponsiveContent(
-              maxWidth: 1120,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final wide = constraints.maxWidth >= 900;
-                  return Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: wide
-                        ? Row(
-                            children: [
-                              Expanded(child: _BrandPane(theme: theme)),
-                              const SizedBox(width: 24),
-                              SizedBox(
-                                width: 440,
-                                child: _FormPane(
-                                  theme: theme,
-                                  firebaseEnabled: firebaseEnabled,
-                                  mode: _mode,
-                                  busy: _busy,
-                                  hidePassword: _hidePassword,
-                                  nameController: _name,
-                                  emailController: _email,
-                                  passwordController: _password,
-                                  confirmController: _confirm,
-                                  error: _error.value,
-                                  onModeChanged: (mode) =>
-                                      setState(() => _mode = mode),
-                                  onTogglePassword: () => setState(
-                                    () => _hidePassword = !_hidePassword,
-                                  ),
-                                  onPrimaryAction: _submit,
-                                  onGoogle: _googleSignIn,
-                                ),
-                              ),
-                            ],
-                          )
-                        : ListView(
-                            children: [
-                              _BrandPane(theme: theme),
-                              const SizedBox(height: 18),
-                              _FormPane(
-                                theme: theme,
-                                firebaseEnabled: firebaseEnabled,
-                                mode: _mode,
-                                busy: _busy,
-                                hidePassword: _hidePassword,
-                                nameController: _name,
-                                emailController: _email,
-                                passwordController: _password,
-                                confirmController: _confirm,
-                                error: _error.value,
-                                onModeChanged: (mode) =>
-                                    setState(() => _mode = mode),
-                                onTogglePassword: () => setState(
-                                  () => _hidePassword = !_hidePassword,
-                                ),
-                                onPrimaryAction: _submit,
-                                onGoogle: _googleSignIn,
-                              ),
-                            ],
-                          ),
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -188,103 +150,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   }
 }
 
-class _BrandPane extends StatelessWidget {
-  const _BrandPane({required this.theme});
-
-  final AppTheme theme;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            theme.elevated.withValues(alpha: .92),
-            theme.background.withValues(alpha: .86),
-          ],
-        ),
-        border: Border.all(color: theme.hairline),
-        boxShadow: [
-          BoxShadow(
-            color: CupertinoColors.black.withValues(alpha: .12),
-            blurRadius: 36,
-            offset: const Offset(0, 22),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'NotesHub',
-            style: TextStyle(
-              color: theme.text,
-              fontSize: 44,
-              fontWeight: FontWeight.w900,
-              height: 1.05,
-            ),
-          ),
-          const SizedBox(height: 14),
-          Text(
-            'An elegant offline notes system with cloud-backed identity and sync.',
-            style: TextStyle(
-              color: theme.secondaryText,
-              fontSize: 18,
-              height: 1.45,
-            ),
-          ),
-          const SizedBox(height: 28),
-          _Feature(theme: theme, title: 'Email and Google sign-in'),
-          _Feature(theme: theme, title: 'Firestore cloud sync'),
-          _Feature(theme: theme, title: 'Apple Notes-style reading and editing'),
-        ],
-      ),
-    );
-  }
-}
-
-class _Feature extends StatelessWidget {
-  const _Feature({required this.theme, required this.title});
-
-  final AppTheme theme;
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Row(
-        children: [
-          Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              color: theme.tint.withValues(alpha: .15),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(CupertinoIcons.check_mark, size: 16, color: theme.tint),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              title,
-              style: TextStyle(
-                color: theme.text,
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _FormPane extends StatelessWidget {
   const _FormPane({
     required this.theme,
@@ -320,137 +185,187 @@ class _FormPane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        color: theme.elevated.withValues(alpha: .88),
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: theme.hairline),
-        boxShadow: [
-          BoxShadow(
-            color: CupertinoColors.black.withValues(alpha: .14),
-            blurRadius: 30,
-            offset: const Offset(0, 20),
+    final signIn = mode == AuthMode.signIn;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Center(child: _NotesHubMark()),
+        const SizedBox(height: 28),
+        Text(
+          signIn ? 'Welcome back' : 'Create account',
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: CupertinoColors.white,
+            fontSize: 29,
+            fontWeight: FontWeight.w800,
+            height: 1.1,
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CupertinoSlidingSegmentedControl<AuthMode>(
-            groupValue: mode,
-            children: const {
-              AuthMode.signIn: Text('Login'),
-              AuthMode.signUp: Text('Register'),
-            },
-            onValueChanged: (value) {
-              if (value != null) onModeChanged(value);
-            },
+        ),
+        const SizedBox(height: 10),
+        Text(
+          signIn ? 'Let\'s get you into NotesHub' : 'Save and sync your notes',
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: Color(0xFF9B9BA1),
+            fontSize: 17,
+            fontWeight: FontWeight.w500,
+            height: 1.35,
           ),
-          const SizedBox(height: 18),
-          if (mode == AuthMode.signUp) ...[
-            _Field(
-              controller: nameController,
-              placeholder: 'Full name',
-              icon: CupertinoIcons.person,
-            ),
-            const SizedBox(height: 12),
-          ],
-          _Field(
-            controller: emailController,
-            placeholder: 'Email address',
-            icon: CupertinoIcons.mail,
-            keyboardType: TextInputType.emailAddress,
-          ),
-          const SizedBox(height: 12),
-          _Field(
-            controller: passwordController,
-            placeholder: 'Password',
-            icon: CupertinoIcons.lock,
-            obscureText: hidePassword,
-            suffix: CupertinoButton(
-              padding: EdgeInsets.zero,
-              minSize: 28,
-              onPressed: onTogglePassword,
-              child: Icon(
-                hidePassword ? CupertinoIcons.eye_slash : CupertinoIcons.eye,
-                size: 18,
-                color: theme.secondaryText,
+        ),
+        const SizedBox(height: 34),
+        CupertinoSlidingSegmentedControl<AuthMode>(
+          groupValue: mode,
+          backgroundColor: const Color(0xFF111113),
+          thumbColor: CupertinoColors.white,
+          children: {
+            AuthMode.signIn: Text(
+              'Sign in',
+              style: TextStyle(
+                color: signIn ? CupertinoColors.black : const Color(0xFFB7B7BC),
+                fontWeight: FontWeight.w700,
               ),
             ),
-          ),
-          if (mode == AuthMode.signUp) ...[
-            const SizedBox(height: 12),
-            _Field(
-              controller: confirmController,
-              placeholder: 'Confirm password',
-              icon: CupertinoIcons.lock_shield,
-              obscureText: hidePassword,
-            ),
-          ],
-          if (error != null) ...[
-            const SizedBox(height: 12),
-            Text(
-              error!,
+            AuthMode.signUp: Text(
+              'Register',
               style: TextStyle(
-                color: theme.rose,
-                fontSize: 13,
+                color: !signIn ? CupertinoColors.black : const Color(0xFFB7B7BC),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          },
+          onValueChanged: (value) {
+            if (value != null) onModeChanged(value);
+          },
+        ),
+        const SizedBox(height: 18),
+        if (!signIn) ...[
+          _Field(controller: nameController, placeholder: 'Full name'),
+          const SizedBox(height: 12),
+        ],
+        _Field(
+          controller: emailController,
+          placeholder: 'Email address',
+          keyboardType: TextInputType.emailAddress,
+        ),
+        const SizedBox(height: 12),
+        _Field(
+          controller: passwordController,
+          placeholder: 'Password',
+          obscureText: hidePassword,
+          suffix: CupertinoButton(
+            padding: EdgeInsets.zero,
+            minimumSize: const Size(34, 34),
+            onPressed: onTogglePassword,
+            child: Icon(
+              hidePassword ? CupertinoIcons.eye_slash : CupertinoIcons.eye,
+              size: 19,
+              color: const Color(0xFF8E8E93),
+            ),
+          ),
+        ),
+        if (!signIn) ...[
+          const SizedBox(height: 12),
+          _Field(
+            controller: confirmController,
+            placeholder: 'Confirm password',
+            obscureText: hidePassword,
+          ),
+        ],
+        if (signIn) ...[
+          const SizedBox(height: 12),
+          CupertinoButton(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            onPressed: () {},
+            child: const Text(
+              'Forgot password?',
+              style: TextStyle(
+                color: Color(0xFF9B9BA1),
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
             ),
-          ],
-          const SizedBox(height: 18),
-          CupertinoButton.filled(
-            borderRadius: BorderRadius.circular(18),
-            onPressed: busy || !firebaseEnabled ? null : onPrimaryAction,
-            child: busy
-                ? const CupertinoActivityIndicator()
-                : Text(mode == AuthMode.signIn ? 'Login' : 'Create account'),
           ),
-          const SizedBox(height: 12),
-          CupertinoButton(
-            borderRadius: BorderRadius.circular(18),
-            color: CupertinoColors.white.withValues(alpha: .06),
-            onPressed: busy || kIsWeb || !firebaseEnabled ? null : onGoogle,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 18,
-                  height: 18,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF4B400),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: const Text(
-                    'G',
-                    style: TextStyle(
-                      color: CupertinoColors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                    ),
+        ],
+        if (error != null) ...[
+          const SizedBox(height: 10),
+          Text(
+            error!,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: theme.rose,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              height: 1.35,
+            ),
+          ),
+        ],
+        const SizedBox(height: 18),
+        CupertinoButton(
+          borderRadius: BorderRadius.circular(24),
+          color: CupertinoColors.white,
+          disabledColor: const Color(0xFF3A3A3C),
+          padding: const EdgeInsets.symmetric(vertical: 17),
+          onPressed: busy || !firebaseEnabled ? null : onPrimaryAction,
+          child: busy
+              ? const CupertinoActivityIndicator(color: CupertinoColors.black)
+              : Text(
+                  signIn ? 'Sign in' : 'Create account',
+                  style: const TextStyle(
+                    color: CupertinoColors.black,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(width: 10),
-                const Text('Continue with Google'),
-              ],
+        ),
+        const SizedBox(height: 24),
+        const _DividerLabel(),
+        const SizedBox(height: 24),
+        CupertinoButton(
+          borderRadius: BorderRadius.circular(22),
+          color: const Color(0xFF151516),
+          disabledColor: const Color(0xFF101011),
+          padding: const EdgeInsets.symmetric(vertical: 15),
+          onPressed: busy || kIsWeb || !firebaseEnabled ? null : onGoogle,
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              GoogleLogo(size: 20),
+              SizedBox(width: 12),
+              Text(
+                'Continue with Google',
+                style: TextStyle(
+                  color: CupertinoColors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (kIsWeb) ...[
+          const SizedBox(height: 12),
+          const Text(
+            'Google sign-in is enabled for the Android build.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Color(0xFF8E8E93), fontSize: 12),
+          ),
+        ],
+        const SizedBox(height: 24),
+        CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: () =>
+              onModeChanged(signIn ? AuthMode.signUp : AuthMode.signIn),
+          child: Text(
+            signIn ? 'Don\'t have an account?' : 'Already have an account?',
+            style: const TextStyle(
+              color: Color(0xFF9B9BA1),
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
             ),
           ),
-          if (kIsWeb) ...[
-            const SizedBox(height: 12),
-            Text(
-              'Firebase sign-in is enabled for the Android build in this workspace.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: theme.secondaryText,
-                fontSize: 12,
-              ),
-            ),
-          ],
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -459,7 +374,6 @@ class _Field extends StatelessWidget {
   const _Field({
     required this.controller,
     required this.placeholder,
-    required this.icon,
     this.obscureText = false,
     this.keyboardType,
     this.suffix,
@@ -467,36 +381,167 @@ class _Field extends StatelessWidget {
 
   final TextEditingController controller;
   final String placeholder;
-  final IconData icon;
   final bool obscureText;
   final TextInputType? keyboardType;
   final Widget? suffix;
 
   @override
   Widget build(BuildContext context) {
-    final theme = CupertinoTheme.of(context);
     return CupertinoTextField(
       controller: controller,
       placeholder: placeholder,
       obscureText: obscureText,
       keyboardType: keyboardType,
       textInputAction: TextInputAction.next,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
-      prefix: Padding(
-        padding: const EdgeInsets.only(left: 12, right: 8),
-        child: Icon(icon, size: 18, color: theme.primaryColor),
+      cursorColor: CupertinoColors.white,
+      style: const TextStyle(
+        color: CupertinoColors.white,
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
       ),
+      placeholderStyle: const TextStyle(
+        color: Color(0xFF747479),
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 17),
       suffix: suffix == null
           ? null
-          : Padding(
-              padding: const EdgeInsets.only(right: 12),
-              child: suffix,
-            ),
+          : Padding(padding: const EdgeInsets.only(right: 12), child: suffix),
       decoration: BoxDecoration(
-        color: theme.scaffoldBackgroundColor,
+        color: CupertinoColors.black,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: CupertinoColors.separator.resolveFrom(context)),
+        border: Border.all(color: const Color(0xFF3B3B40), width: 1.2),
       ),
     );
   }
+}
+
+class _NotesHubMark extends StatelessWidget {
+  const _NotesHubMark();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(9),
+            border: Border.all(color: CupertinoColors.white, width: 2.4),
+          ),
+          child: Center(
+            child: Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: CupertinoColors.white,
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        const Text(
+          'NotesHub',
+          style: TextStyle(
+            color: CupertinoColors.white,
+            fontSize: 29,
+            fontWeight: FontWeight.w800,
+            height: 1,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DividerLabel extends StatelessWidget {
+  const _DividerLabel();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Row(
+      children: [
+        Expanded(
+          child: ColoredBox(
+            color: Color(0xFF2C2C2E),
+            child: SizedBox(height: 1),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          child: Text(
+            'or',
+            style: TextStyle(
+              color: Color(0xFFB0B0B5),
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        Expanded(
+          child: ColoredBox(
+            color: Color(0xFF2C2C2E),
+            child: SizedBox(height: 1),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class GoogleLogo extends StatelessWidget {
+  const GoogleLogo({this.size = 20, super.key});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: Size.square(size),
+      painter: _GoogleLogoPainter(),
+    );
+  }
+}
+
+class _GoogleLogoPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final stroke = size.width * .16;
+    final arcRect = (Offset.zero & size).deflate(stroke / 2);
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = stroke
+      ..strokeCap = StrokeCap.round;
+
+    paint.color = const Color(0xFF4285F4);
+    canvas.drawArc(arcRect, -.05, 1.45, false, paint);
+
+    paint.color = const Color(0xFF34A853);
+    canvas.drawArc(arcRect, 1.40, 1.22, false, paint);
+
+    paint.color = const Color(0xFFFBBC05);
+    canvas.drawArc(arcRect, 2.62, 1.22, false, paint);
+
+    paint.color = const Color(0xFFEA4335);
+    canvas.drawArc(arcRect, 3.84, 1.55, false, paint);
+
+    final barPaint = Paint()
+      ..color = const Color(0xFF4285F4)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = stroke
+      ..strokeCap = StrokeCap.square;
+    final y = size.height * .52;
+    canvas.drawLine(
+      Offset(size.width * .52, y),
+      Offset(size.width * .92, y),
+      barPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

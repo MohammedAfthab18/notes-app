@@ -40,8 +40,12 @@ class CloudSyncService {
 
     for (final local in subjectBox.values) {
       final remote = remoteSubjectMap[local.id];
-      if (remote == null || local.updatedAt.isAfter(_readDate(remote['updatedAt']))) {
-        await userRef.collection('subjects').doc(local.id).set(_subjectMap(local));
+      if (remote == null ||
+          local.updatedAt.isAfter(_readDate(remote['updatedAt']))) {
+        await userRef
+            .collection('subjects')
+            .doc(local.id)
+            .set(_subjectMap(local));
       }
     }
     for (final entry in remoteSubjectMap.entries) {
@@ -54,8 +58,12 @@ class CloudSyncService {
 
     for (final local in chapterBox.values) {
       final remote = remoteChapterMap[local.id];
-      if (remote == null || local.updatedAt.isAfter(_readDate(remote['updatedAt']))) {
-        await userRef.collection('chapters').doc(local.id).set(_chapterMap(local));
+      if (remote == null ||
+          local.updatedAt.isAfter(_readDate(remote['updatedAt']))) {
+        await userRef
+            .collection('chapters')
+            .doc(local.id)
+            .set(_chapterMap(local));
       }
     }
     for (final entry in remoteChapterMap.entries) {
@@ -71,10 +79,10 @@ class CloudSyncService {
     if (!_enabled) return;
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
-    await _userRef(user.uid).collection('subjects').doc(subject.id).set(
-          _subjectMap(subject),
-          SetOptions(merge: true),
-        );
+    await _userRef(user.uid)
+        .collection('subjects')
+        .doc(subject.id)
+        .set(_subjectMap(subject), SetOptions(merge: true));
   }
 
   Future<void> deleteSubject(String subjectId) async {
@@ -98,10 +106,10 @@ class CloudSyncService {
     if (!_enabled) return;
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
-    await _userRef(user.uid).collection('chapters').doc(chapter.id).set(
-          _chapterMap(chapter),
-          SetOptions(merge: true),
-        );
+    await _userRef(user.uid)
+        .collection('chapters')
+        .doc(chapter.id)
+        .set(_chapterMap(chapter), SetOptions(merge: true));
   }
 
   Future<void> deleteChapter(String chapterId) async {
@@ -118,22 +126,23 @@ class CloudSyncService {
     final batch = FirebaseFirestore.instance.batch();
     final ref = _userRef(user.uid).collection('subjects');
     for (final subject in subjects) {
-      batch.set(ref.doc(subject.id), _subjectMap(subject), SetOptions(merge: true));
+      batch.set(
+        ref.doc(subject.id),
+        _subjectMap(subject),
+        SetOptions(merge: true),
+      );
     }
     await batch.commit();
   }
 
   Future<void> _ensureUserDoc(User user) async {
-    await _userRef(user.uid).set(
-      {
-        'uid': user.uid,
-        'email': user.email,
-        'displayName': user.displayName,
-        'photoURL': user.photoURL,
-        'lastLoginAt': FieldValue.serverTimestamp(),
-      },
-      SetOptions(merge: true),
-    );
+    await _userRef(user.uid).set({
+      'uid': user.uid,
+      'email': user.email,
+      'displayName': user.displayName,
+      'photoURL': user.photoURL,
+      'lastLoginAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
   }
 
   DocumentReference<Map<String, dynamic>> _userRef(String uid) {
