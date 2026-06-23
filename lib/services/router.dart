@@ -1,7 +1,13 @@
+import 'dart:async';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/auth/providers/auth_providers.dart';
+import '../features/auth/views/auth_screen.dart';
 import '../features/home/views/home_screen.dart';
 import '../features/notes/views/editor_screen.dart';
 import '../features/notes/views/reader_screen.dart';
@@ -11,9 +17,26 @@ import '../features/statistics/views/statistics_screen.dart';
 import '../features/subjects/views/subject_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
+  final firebaseEnabled = ref.watch(firebaseEnabledProvider);
+  final auth = firebaseEnabled ? FirebaseAuth.instance : null;
+
   return GoRouter(
     initialLocation: '/',
+    refreshListenable:
+        firebaseEnabled ? _GoRouterRefreshStream(auth!.authStateChanges()) : null,
+    redirect: (context, state) {
+      if (!firebaseEnabled) return null;
+      final user = auth!.currentUser;
+      final goingToAuth = state.matchedLocation == '/auth';
+      if (user == null) return goingToAuth ? null : '/auth';
+      if (goingToAuth) return '/';
+      return null;
+    },
     routes: [
+      GoRoute(
+        path: '/auth',
+        pageBuilder: _page((state) => const AuthScreen()),
+      ),
       GoRoute(path: '/', pageBuilder: _page((state) => const HomeScreen())),
       GoRoute(
         path: '/subject/:id',
@@ -58,6 +81,20 @@ final routerProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
+
+class _GoRouterRefreshStream extends ChangeNotifier {
+  _GoRouterRefreshStream(Stream<dynamic> stream) {
+    _subscription = stream.listen((_) => notifyListeners());
+  }
+
+  late final StreamSubscription<dynamic> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+}
 
 Page<dynamic> Function(BuildContext, GoRouterState) _page(
   Widget Function(GoRouterState state) builder,

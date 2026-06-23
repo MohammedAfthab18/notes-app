@@ -5,6 +5,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
+import '../../auth/providers/auth_providers.dart';
+import '../../../services/auth_service.dart';
 import '../../../services/backup_service.dart';
 import '../../home/providers/home_providers.dart';
 
@@ -18,6 +20,7 @@ class SettingsScreen extends ConsumerWidget {
     final appearance = AppAppearance.values.byName(
       box.get('appearance', defaultValue: AppAppearance.system.name) as String,
     );
+    final firebaseEnabled = ref.watch(firebaseEnabledProvider);
 
     return CupertinoPageScaffold(
       backgroundColor: theme.background,
@@ -91,6 +94,12 @@ class SettingsScreen extends ConsumerWidget {
             _Group(
               title: 'Maintenance',
               children: [
+                if (firebaseEnabled)
+                  _Row(
+                    title: 'Sign out',
+                    icon: CupertinoIcons.square_arrow_right,
+                    onTap: () => authService.signOut(),
+                  ),
                 _Row(
                   title: 'Clear cache',
                   icon: CupertinoIcons.clear,

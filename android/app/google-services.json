@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "743947953582",
+    "project_id": "noteshub-140e4",
+    "storage_bucket": "noteshub-140e4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:743947953582:android:10861881856aff86d8143f",
+        "android_client_info": {
+          "package_name": "com.webtrendz.noteshub"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRUg_pN4U3kRhQfgHpE4AVLe2aBdFviDY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

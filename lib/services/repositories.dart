@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:hive_flutter/hive_flutter.dart';
@@ -6,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import '../core/constants/app_constants.dart';
 import '../features/home/models/subject.dart';
 import '../features/notes/models/chapter.dart';
+import 'cloud_sync_service.dart';
 
 class SubjectRepository {
   SubjectRepository(this._box, this._chapters);
@@ -28,16 +30,19 @@ class SubjectRepository {
       iconIndex: _box.length,
     );
     await _box.put(subject.id, subject);
+    unawaited(cloudSyncService.upsertSubject(subject));
     return subject;
   }
 
   Future<void> rename(String id, String title) async {
     final subject = _box.get(id);
     if (subject == null) return;
-    await _box.put(
-      id,
-      subject.copyWith(title: title.trim(), updatedAt: DateTime.now()),
+    final updated = subject.copyWith(
+      title: title.trim(),
+      updatedAt: DateTime.now(),
     );
+    await _box.put(id, updated);
+    unawaited(cloudSyncService.upsertSubject(updated));
   }
 
   Future<void> delete(String id) async {
@@ -48,15 +53,18 @@ class SubjectRepository {
     await _chapters.deleteAll(related);
     await _box.delete(id);
     await reorder(all());
+    unawaited(cloudSyncService.deleteSubject(id));
   }
 
   Future<void> reorder(List<Subject> subjects) async {
     for (final entry in subjects.indexed) {
-      await _box.put(
-        entry.$2.id,
-        entry.$2.copyWith(position: entry.$1, updatedAt: DateTime.now()),
+      final updated = entry.$2.copyWith(
+        position: entry.$1,
+        updatedAt: DateTime.now(),
       );
+      await _box.put(entry.$2.id, updated);
     }
+    unawaited(cloudSyncService.reorderSubjects(subjects));
   }
 }
 
@@ -96,14 +104,20 @@ class ChapterRepository {
       updatedAt: now,
     );
     await _box.put(chapter.id, chapter);
+    unawaited(cloudSyncService.upsertChapter(chapter));
     return chapter;
   }
 
   Future<void> update(Chapter chapter) async {
-    await _box.put(chapter.id, chapter.copyWith(updatedAt: DateTime.now()));
+    final updated = chapter.copyWith(updatedAt: DateTime.now());
+    await _box.put(updated.id, updated);
+    unawaited(cloudSyncService.upsertChapter(updated));
   }
 
-  Future<void> delete(String id) => _box.delete(id);
+  Future<void> delete(String id) async {
+    await _box.delete(id);
+    unawaited(cloudSyncService.deleteChapter(id));
+  }
 
   Future<void> markOpened(String id) async {
     final chapter = get(id);
